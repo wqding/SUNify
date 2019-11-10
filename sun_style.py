@@ -8,7 +8,6 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 import tensorflow as tf
 import tensorflow_datasets as tfds
 from tensorflow_examples.models.pix2pix import pix2pix
-import numpy as np
 
 import os
 import time
@@ -24,9 +23,8 @@ IMG_WIDTH = 256
 IMG_HEIGHT = 256
 
 
-EPOCHS = 80
+EPOCHS = 75
 OUTPUT_CHANNELS = 3
-
 
 
 # in a cnn, 3 input channels = rgb, then your stack of filters are applied to each imput channel seperately
@@ -123,44 +121,23 @@ generator_f_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_x_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 discriminator_y_optimizer = tf.keras.optimizers.Adam(2e-4, beta_1=0.5)
 
-checkpoint_path = "./checkpoints/train"
-
-ckpt = tf.train.Checkpoint(
-    generator_g=generator_g,
-    generator_f=generator_f,
-    discriminator_x=discriminator_x,
-    discriminator_y=discriminator_y,
-    generator_g_optimizer=generator_g_optimizer,
-    generator_f_optimizer=generator_f_optimizer,
-    discriminator_x_optimizer=discriminator_x_optimizer,
-    discriminator_y_optimizer=discriminator_y_optimizer
-)
-
-ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
-
-# if a checkpoint exists, restore the latest checkpoint.
-if ckpt_manager.latest_checkpoint:
-    ckpt.restore(ckpt_manager.latest_checkpoint)
-    print ('Latest checkpoint restored!!')
-
-
 
 #train
-def generate_images(model, test_input):
+def generate_images(model, test_input, idx):
     prediction = model(test_input)
         
     plt.figure(figsize=(12, 12))
 
     display_list = [test_input[0], prediction[0]]
-    title = ['Input Image', 'Predicted Image']
+    title = ['Input', 'Predict']
 
     for i in range(2):
         plt.subplot(1, 2, i+1)
-        plt.title(title[i])
         # getting the pixel values between [0, 1] to plot it.
         plt.imshow(display_list[i] * 0.5 + 0.5)
         plt.axis('off')
-    plt.show()
+    save_path = 'predictions/' + str(idx) + '.jpg'
+    plt.savefig(save_path)
     
 @tf.function
 def train_step(real_x, real_y):
@@ -218,56 +195,64 @@ def train_step(real_x, real_y):
 
 
 
-#run
-train_gloomy = create_dataset('resized/gloomy')
-train_sunny = create_dataset('resized/sunny')
+# checkpoint_path = "./checkpoints/train"
 
-test_gloomy = create_dataset('resized/test_gloomy')
+# ckpt = tf.train.Checkpoint(
+#     generator_g=generator_g,
+#     generator_f=generator_f,
+#     discriminator_x=discriminator_x,
+#     discriminator_y=discriminator_y,
+#     generator_g_optimizer=generator_g_optimizer,
+#     generator_f_optimizer=generator_f_optimizer,
+#     discriminator_x_optimizer=discriminator_x_optimizer,
+#     discriminator_y_optimizer=discriminator_y_optimizer
+# )
 
+# ckpt_manager = tf.train.CheckpointManager(ckpt, checkpoint_path, max_to_keep=5)
 
-train_gloomy = train_gloomy.map(
-    preprocess_image_train, num_parallel_calls=AUTOTUNE).cache().shuffle(
-    BUFFER_SIZE).batch(1)
+# # if a checkpoint exists, restore the latest checkpoint.
+# if ckpt_manager.latest_checkpoint:
+#     ckpt.restore(ckpt_manager.latest_checkpoint)
+#     print ('Latest checkpoint restored!!')
 
-train_sunny = train_sunny.map(
-    preprocess_image_train, num_parallel_calls=AUTOTUNE).cache().shuffle(
-    BUFFER_SIZE).batch(1)
+# #run
+# train_gloomy = create_dataset('resized/gloomy')
+# train_sunny = create_dataset('resized/sunny')
 
-test_gloomy = test_gloomy.map(
-    preprocess_image_test, num_parallel_calls=AUTOTUNE).cache().shuffle(
-    BUFFER_SIZE).batch(1)
+# train_gloomy = train_gloomy.map(
+#     preprocess_image_train, num_parallel_calls=AUTOTUNE).cache().shuffle(
+#     BUFFER_SIZE).batch(1)
 
-sample_gloomy = next(iter(train_gloomy))
-# print(sample_gloomy)
+# train_sunny = train_sunny.map(
+#     preprocess_image_train, num_parallel_calls=AUTOTUNE).cache().shuffle(
+#     BUFFER_SIZE).batch(1)
 
-generate_images(generator_g, sample_gloomy)
+# sample_gloomy = next(iter(train_gloomy))
+# # print(sample_gloomy)
 
-for epoch in range(EPOCHS):
-    start = time.time()
+# for epoch in range(EPOCHS):
+#     start = time.time()
 
-    n = 0
-    for image_x, image_y in tf.data.Dataset.zip((train_gloomy, train_sunny)):
-        train_step(image_x, image_y)
-        if n % 10 == 0:
-            print('.', end='')
-             
-        n+=1
+#     n = 0
+#     for image_x, image_y in tf.data.Dataset.zip((train_gloomy, train_sunny)):
+#         train_step(image_x, image_y)
+#         if n % 10 == 0:
+#             print('.', end='')
+            
+#         n+=1
 
-    clear_output(wait=True)
-    # Using a consistent image (sample_horse) so that the progress of the model
-    # is clearly visible.
-    # generate_images(generator_g, sample_gloomy)
+#     clear_output(wait=True)
+#     # Using a consistent image (sample_horse) so that the progress of the model
+#     # is clearly visible.
 
-    if (epoch + 1) % 5 == 0:
-        ckpt_save_path = ckpt_manager.save()
-        print('Saving checkpoint for epoch {} at {}'.format(epoch+1, ckpt_save_path))
+#     if (epoch + 1) % 5 == 0:
+#         generate_images(generator_g, sample_gloomy, epoch)
+#         ckpt_save_path = ckpt_manager.save()
+#         print('Saving checkpoint for epoch {} at {}'.format(epoch+1, ckpt_save_path))
 
-    print('Time taken for epoch {} is {} sec\n'.format(epoch + 1, time.time()-start))
+#     print('Time taken for epoch {} is {} sec\n'.format(epoch + 1, time.time()-start))
 
-tf.saved_model.save(generator_g, './saved/generator_g')
+# tf.saved_model.save(generator_g, './saved/generator_g')
 
-# Run the trained model on the test dataset
-for inp in test_gloomy.take(3):
-    generate_images(generator_g, inp)
 
 
