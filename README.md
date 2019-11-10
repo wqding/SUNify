@@ -11,8 +11,8 @@ You can take the untrained model and use it to train on a different dataset to p
 
 Results using images taken from my own camera:
 
-![Alt text](examples/ex1.png, "example 1")
+![Alt text](./examples/ex1.png, "example 1")
 
-![Alt text](examples/ex2.png, "example 2")
+![Alt text](./examples/ex2.png, "example 2")
 
-![Alt text](examples/ex3.png, "example 3")
+![Alt text](./examples/ex3.png, "example 3")
