@@ -5,7 +5,7 @@ Turn a cloudy picture into a SUNNY one!!!
 
 This model uses the CycleGAN technique to perform unpaired image to image translation.
 
-You can <a src="https://drive.google.com/open?id=1YxaG1aUWy2EGobZ_V_FWJ1OOB2WbHE_-">download the trained model here</a> 
+You can <a href="https://drive.google.com/open?id=1YxaG1aUWy2EGobZ_V_FWJ1OOB2WbHE_-">download the trained model here</a> 
 
 You can load it using tf.saved_model.load(): https://www.tensorflow.org/api_docs/python/tf/saved_model/load
 
