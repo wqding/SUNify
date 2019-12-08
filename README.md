@@ -1,4 +1,5 @@
 # SUNify
+<img src="SUNify.jpg" width="300px">
 
 Turn a cloudy picture into a SUNNY one!!!
 
