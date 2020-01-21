@@ -3,7 +3,7 @@
 
 Turn a cloudy picture into a SUNNY one!!!
 
-This model uses the CycleGAN technique to perform unpaired image to image translation.
+A CycleGAN model to enable training with unpaired data.
 
 You can <a href="https://drive.google.com/open?id=1YxaG1aUWy2EGobZ_V_FWJ1OOB2WbHE_-">download the trained model here</a> 
 
