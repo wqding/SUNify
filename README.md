@@ -29,8 +29,7 @@ Generator G takes in X and outputs G(X) = Y, which is then fed into generator F 
 
 # Download the trained model
 You can <a href="https://drive.google.com/open?id=1YxaG1aUWy2EGobZ_V_FWJ1OOB2WbHE_-">download the trained model here</a> 
-
-You can load it using tf.saved_model.load(): https://www.tensorflow.org/api_docs/python/tf/saved_model/load
+Load the model using tf.saved_model.load(): https://www.tensorflow.org/api_docs/python/tf/saved_model/load
 
 # Get the untrained model
 You can take the untrained model and use it to train on a different dataset to produce your own image translator. For the untrained model, checkout ![sun_style.py](sun_style.py)
